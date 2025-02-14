@@ -1,48 +1,120 @@
-package id.ac.ui.cs.advprog.eshop.model;
+package id.ac.ui.cs.advprog.eshop.service;
 
+import id.ac.ui.cs.advprog.eshop.model.Product;
+import id.ac.ui.cs.advprog.eshop.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class ProductTest {
-    Product product;
+
+    @Mock
+    private ProductRepository productRepository;
+
+    @InjectMocks
+    private ProductServiceImpl productService;
+
+    private Product testProduct;
 
     @BeforeEach
     void setUp() {
-        this.product = new Product();
-        this.product.setProductId("eb558e9f-1c39-460e-8860-71af6af63bd6");
-        this.product.setProductName("Sampo Cap Bambang");
-        this.product.setProductQuantity(100);
+        testProduct = new Product();
+        testProduct.setProductId("test-id-1");
+        testProduct.setProductName("Test Product");
+        testProduct.setProductQuantity(10);
     }
 
     @Test
-    void testGetProductId() {
-        assertEquals("eb558e9f-1c39-460e-8860-71af6af63bd6", product.getProductId());
+    void testUpdateProduct_Success() {
+        Product updatedProduct = new Product();
+        updatedProduct.setProductId("test-id-1");
+        updatedProduct.setProductName("Updated Product");
+        updatedProduct.setProductQuantity(20);
+
+        when(productRepository.update(any(Product.class))).thenReturn(updatedProduct);
+
+        Product result = productService.update(updatedProduct);
+
+        assertNotNull(result);
+        assertEquals("Updated Product", result.getProductName());
+        assertEquals(20, result.getProductQuantity());
+        verify(productRepository, times(1)).update(any(Product.class));
     }
 
     @Test
-    void testGetProductName() {
-        assertEquals("Sampo Cap Bambang", product.getProductName());
+    void testFindProductById_Success() {
+        when(productRepository.findById("test-id-1")).thenReturn(testProduct);
+
+        Product result = productService.findById("test-id-1");
+
+        assertNotNull(result);
+        assertEquals(testProduct.getProductId(), result.getProductId());
+        assertEquals(testProduct.getProductName(), result.getProductName());
     }
 
     @Test
-    void testGetProductQuantity() {
-        assertEquals(100, product.getProductQuantity());
+    void testUpdateProduct_NonexistentProduct() {
+        Product nonexistentProduct = new Product();
+        nonexistentProduct.setProductId("nonexistent-id");
+        when(productRepository.update(any(Product.class))).thenReturn(null);
+
+        Product result = productService.update(nonexistentProduct);
+
+        assertNull(result);
+        verify(productRepository, times(1)).update(any(Product.class));
     }
 
     @Test
-    void testGetProductIdNegative() {
-        assertNotEquals("eb558e9f-1c39-460e-8860-71af6af63bd7", product.getProductId());
+    void testDeleteProduct_Success() {
+        doNothing().when(productRepository).delete("test-id-1");
+
+        productService.delete("test-id-1");
+
+        verify(productRepository, times(1)).delete("test-id-1");
     }
 
     @Test
-    void testGetProductNameNegative() {
-        assertNotEquals("Sampo Cap Bang", product.getProductName());
+    void testDeleteProduct_NonexistentProduct() {
+        doNothing().when(productRepository).delete("nonexistent-id");
+
+        productService.delete("nonexistent-id");
+
+        verify(productRepository, times(1)).delete("nonexistent-id");
     }
 
     @Test
-    void testGetProductQuantityNegative() {
-        assertNotEquals(101, product.getProductQuantity());
+    void testDeleteProduct_NullId() {
+        productService.delete(null);
+        verify(productRepository, times(1)).delete(null);
+    }
+
+    @Test
+    void testUpdateProduct_NullProduct() {
+        when(productRepository.update(null)).thenReturn(null);
+
+        Product result = productService.update(null);
+
+        assertNull(result);
+        verify(productRepository, times(1)).update(null);
+    }
+
+    @Test
+    void testUpdateProduct_EmptyFields() {
+        Product emptyProduct = new Product();
+        when(productRepository.update(any(Product.class))).thenReturn(emptyProduct);
+
+        Product result = productService.update(emptyProduct);
+
+        assertNotNull(result);
+        assertNull(result.getProductName());
+        assertEquals(0, result.getProductQuantity());
+        verify(productRepository, times(1)).update(any(Product.class));
     }
 }
