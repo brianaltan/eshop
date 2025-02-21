@@ -95,4 +95,9 @@ tasks.test {
 
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
+    reports {
+        xml.required = true
+        csv.required = false
+        html.required = true
+    }
 }
