@@ -11,8 +11,8 @@ version = "0.0.1-SNAPSHOT"
 
 sonar {
     properties {
-        property "sonar.projectKey", "adpro-eshop"
-        property "sonar.projectName", "adpro-eshop"
+        property("sonar.projectKey", "adpro-eshop")
+        property("sonar.projectName", "adpro-eshop")
     }
 }
 
