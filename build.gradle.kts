@@ -3,10 +3,18 @@ plugins {
     jacoco
     id("org.springframework.boot") version "3.4.2"
     id("io.spring.dependency-management") version "1.1.7"
+    id("org.sonarqube") version "6.0.1.5171"
 }
 
 group = "id.ac.ui.cs.advprog"
 version = "0.0.1-SNAPSHOT"
+
+sonar {
+    properties {
+        property("sonar.projectKey", "adpro-eshop")
+        property("sonar.projectName", "adpro-eshop")
+    }
+}
 
 java {
     toolchain {
@@ -30,31 +38,41 @@ val webdrivermanagerVersion = "5.6.3"
 val junitJupiterVersion = "5.9.1"
 
 dependencies {
+    // Implementation dependencies
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-web")
+
+    // Compile-only dependencies
     compileOnly("org.projectlombok:lombok")
+
+    // Development-only dependencies
     developmentOnly("org.springframework.boot:spring-boot-devtools")
+
+    // Annotation processors
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     annotationProcessor("org.projectlombok:lombok")
+
+    // Test dependencies for unit testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
     testImplementation("org.seleniumhq.selenium:selenium-java:$seleniumJavaVersion")
     testImplementation("io.github.bonigarcia:selenium-jupiter:$seleniumJupiterVersion")
     testImplementation("io.github.bonigarcia:webdrivermanager:$webdrivermanagerVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
+
+    // Test runtime-only dependencies
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-
-tasks.register<Test>("unitTest"){
+tasks.register<Test>("unitTest") {
     description = "Runs unit tests."
     group = "verification"
 
-    filter{
+    filter {
         excludeTestsMatching("*FunctionalTest")
     }
 }
 
-tasks.register<Test>("functionalTest"){
+tasks.register<Test>("functionalTest") {
     description = "Runs functional tests."
     group = "verification"
 
@@ -67,14 +85,14 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
-tasks.test{
-    filter{
+tasks.test {
+    filter {
         excludeTestsMatching("*FunctionalTest")
     }
 
     finalizedBy(tasks.jacocoTestReport)
 }
 
-tasks.jacocoTestReport{
+tasks.jacocoTestReport {
     dependsOn(tasks.test)
 }
