@@ -16,9 +16,12 @@ class ProductRepositoryTest {
 
     @InjectMocks
     ProductRepository productRepository;
+
     @BeforeEach
     void setUp() {
+        productRepository = new ProductRepository();
     }
+
     @Test
     void testCreateAndFind() {
         Product product = new Product();
@@ -64,4 +67,79 @@ class ProductRepositoryTest {
         assertFalse(productIterator.hasNext());
     }
 
+    @Test
+    void testFindProductById() {
+        Product product = new Product();
+        product.setProductId("test-id-1");
+        product.setProductName("Test Product");
+        product.setProductQuantity(25);
+        productRepository.create(product);
+
+        Product foundProduct = productRepository.findById("test-id-1");
+        assertNotNull(foundProduct);
+        assertEquals("Test Product", foundProduct.getProductName());
+    }
+
+    @Test
+    void testFindProductById_NotFound() {
+        Exception exception = assertThrows(RuntimeException.class, () ->
+                productRepository.findById("nonexistent-id")
+        );
+        assertEquals("Product not found", exception.getMessage());
+    }
+
+    @Test
+    void testUpdateProduct() {
+        Product product = new Product();
+        product.setProductId("test-id-2");
+        product.setProductName("Test Product");
+        product.setProductQuantity(30);
+        productRepository.create(product);
+
+        Product updatedProduct = new Product();
+        updatedProduct.setProductId("test-id-2");
+        updatedProduct.setProductName("Updated Product");
+        updatedProduct.setProductQuantity(40);
+
+        Product result = productRepository.update(updatedProduct);
+        assertEquals("Updated Product", result.getProductName());
+        assertEquals(40, result.getProductQuantity());
+    }
+
+    @Test
+    void testUpdateProduct_NotFound() {
+        Product updatedProduct = new Product();
+        updatedProduct.setProductId("nonexistent-id");
+        updatedProduct.setProductName("Updated Product");
+        updatedProduct.setProductQuantity(40);
+
+        Exception exception = assertThrows(RuntimeException.class, () ->
+                productRepository.update(updatedProduct)
+        );
+        assertEquals("Product not found", exception.getMessage());
+    }
+
+    @Test
+    void testDeleteProduct() {
+        Product product = new Product();
+        product.setProductId("test-id-3");
+        product.setProductName("Product to Delete");
+        product.setProductQuantity(5);
+        productRepository.create(product);
+
+        productRepository.delete("test-id-3");
+
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            productRepository.findById("test-id-3");
+        });
+        assertEquals("Product not found", exception.getMessage());
+    }
+
+    @Test
+    void testDeleteNonexistentProduct() {
+        // Ensure that deleting a nonexistent product doesn't throw an error
+        assertDoesNotThrow(() -> {
+            productRepository.delete("nonexistent-id");
+        });
+    }
 }
