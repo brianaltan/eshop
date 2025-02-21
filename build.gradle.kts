@@ -39,10 +39,8 @@ val junitJupiterVersion = "5.9.1"
 
 dependencies {
     // Implementation dependencies
-    implementation(
-        "org.springframework.boot:spring-boot-starter-thymeleaf",
-        "org.springframework.boot:spring-boot-starter-web"
-    )
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+    implementation("org.springframework.boot:spring-boot-starter-web")
 
     // Compile-only dependencies
     compileOnly("org.projectlombok:lombok")
@@ -50,23 +48,19 @@ dependencies {
     // Development-only dependencies
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
-    // Annotation processor dependencies
-    annotationProcessor(
-        "org.springframework.boot:spring-boot-configuration-processor",
-        "org.projectlombok:lombok"
-    )
+    // Annotation processors
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    annotationProcessor("org.projectlombok:lombok")
 
-    // Test implementation dependencies
-    testImplementation(
-        "org.springframework.boot:spring-boot-starter-test",
-        "org.seleniumhq.selenium:selenium-java:$seleniumJavaVersion",
-        "io.github.bonigarcia:selenium-jupiter:$seleniumJupiterVersion",
-        "io.github.bonigarcia:webdrivermanager:$webdrivermanagerVersion",
-        "org.junit.jupiter:junit-jupiter:$junitJupiterVersion"
-    )
-
-    // Test runtime-only dependencies
+    // Test dependencies for unit tests
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
+
+    // Test dependencies for Selenium (functional testing)
+    testImplementation("org.seleniumhq.selenium:selenium-java:$seleniumJavaVersion")
+    testImplementation("io.github.bonigarcia:selenium-jupiter:$seleniumJupiterVersion")
+    testImplementation("io.github.bonigarcia:webdrivermanager:$webdrivermanagerVersion")
 }
 
 tasks.register<Test>("unitTest") {
