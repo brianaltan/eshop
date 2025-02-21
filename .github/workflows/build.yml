@@ -2,9 +2,6 @@ name: Build
 
 on:
   push:
-    branches:
-      - main
-      - module-2-exercise
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -40,4 +37,4 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: ./gradlew build sonar --info
+        run: ./gradlew build jacocoTestReport sonar -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml --info
