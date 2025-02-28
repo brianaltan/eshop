@@ -16,8 +16,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import id.ac.ui.cs.advprog.eshop.service.CarService;
-
 @WebMvcTest(ProductController.class)
 class ProductControllerTest {
 
@@ -26,12 +24,6 @@ class ProductControllerTest {
 
     @MockBean
     private ProductService productService;
-
-    @MockBean
-    private CarController carController;
-
-    @MockBean
-    private CarService carService;
 
     private Product testProduct;
 
