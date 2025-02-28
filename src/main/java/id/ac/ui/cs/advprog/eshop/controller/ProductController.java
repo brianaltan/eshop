@@ -16,9 +16,12 @@ import java.util.List;
 @RequestMapping("/product")
 
 public class ProductController {
+    private final ProductService service;
 
     @Autowired
-    private ProductService service;
+    public ProductController(ProductService service) {
+        this.service = service;
+    }
 
     @GetMapping("/create")
     public String createProductPage(Model model) {
@@ -63,8 +66,13 @@ public class ProductController {
 @Controller
 @RequestMapping("/car")
 class CarController extends ProductController {
+    private final CarServiceImpl carservice;
+
     @Autowired
-    private CarServiceImpl carservice;
+    public CarController(ProductService service, CarServiceImpl carservice) {
+        super(service);
+        this.carservice = carservice;
+    }
 
     @GetMapping("/createCar")
     public String createCarPage(Model model) {
