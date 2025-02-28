@@ -12,12 +12,11 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/car")
-class CarController extends ProductController {
+class CarController {
     private final CarServiceImpl carservice;
 
     @Autowired
-    public CarController(ProductService service, CarServiceImpl carservice) {
-        super(service);
+    public CarController(CarServiceImpl carservice) {
         this.carservice = carservice;
     }
 
