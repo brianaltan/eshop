@@ -3,7 +3,7 @@
 ## Quick Links
 - [Module 1 - Coding Standards](#module-1---coding-standards)
 - [Module 2 - CI/CD & DevOps](#module-2---cicd--devops)
-
+- [Module 3 - Maintainability & OO Principles](#module-3---maintainability--oo-principles)
 ### Module 1 - Coding Standards
 #### Reflection 1
 During the first part of the exercise, I used meaningful and descriptive names for variables, methods, and classes to clearly describe their intended use. Controller methods were also used to route incoming HTTP requests to service methods, ensuring that service methods focused only on implementing the business logic. We then used a repository to handle the requests as needed.
@@ -24,3 +24,19 @@ To address this, I reorganized the dependencies by grouping them based on their 
 
 
 2. Yes, the current implementation meets the definition of CI/CD. For every push and pull request, the code is automatically built and deployed through Koyeb, ensuring changes are promptly reflected in the deployment process. Unit tests are executed with Jacoco to maintain code coverage and quality, while static code analysis is performed using SonarQube to detect potential issues. Additionally, a Scorecard analysis is conducted to ensure the pipeline is secure and adheres to best security practices, all this implementation resulted in an automated CI/CD process.
+
+### Module 3 - Maintainability & OO Principles
+1. SOLID Principles Implemented:
+- Single Responsibility Principle (SRP):
+  Initially, `ProductController` and `CarController` were combined and shared mixed responsibilities. After analyzing the structure, I separated the two classes into distinct files to ensure they have clear, independent responsibilities.
+
+- Liskov Substitution Principle (LSP):  
+  `CarController` was originally inheriting methods from `ProductController`, which was not appropriate as per the definition of this principle. The inherited methods were not suitable for substitution, and the design was inconsistent. To address this, I removed the inheritance entirely.
+
+- Dependency Inversion Principle (DIP):  
+  Initially, the `CarController` directly depended on `CarServiceImpl`, which violated the DIP principle. To resolve this, I refactored `CarServiceImpl` to depend on its own interface.
+
+2. Applying SOLID principles has greatly improved my project by making it more organized, maintainable, and readable. For example, by ensuring that each class has only one responsibility (Single Responsibility Principle), the codebase is now much easier to understand and modify. Instead of dealing with multiple interconnected files, I only need to focus on 1-2 files directly related to the `CarController`, which simplifies both debugging and adding new features. This separation of concerns reduces the likelihood of errors and makes the project more scalable and efficient to work on.
+
+
+3. Without applying SOLID principles, modifying or adding new features becomes risky. For instance, having `CarController` extend `ProductController` created unnecessary complexity, as it inherited irrelevant methods that didn’t apply to cars. This made the code harder to understand, slowed down testing, introduced potential bugs, and required extra effort to track down and modify related files, reducing overall productivity and maintainability.
