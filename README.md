@@ -4,6 +4,7 @@
 - [Module 1 - Coding Standards](#module-1---coding-standards)
 - [Module 2 - CI/CD & DevOps](#module-2---cicd--devops)
 - [Module 3 - Maintainability & OO Principles](#module-3---maintainability--oo-principles)
+- [Module 4 - Refactoring and TDD](#module-4---refactoring-and-tdd)
 ### Module 1 - Coding Standards
 #### Reflection 1
 During the first part of the exercise, I used meaningful and descriptive names for variables, methods, and classes to clearly describe their intended use. Controller methods were also used to route incoming HTTP requests to service methods, ensuring that service methods focused only on implementing the business logic. We then used a repository to handle the requests as needed.
@@ -40,3 +41,12 @@ To address this, I reorganized the dependencies by grouping them based on their 
 
 
 3. Without applying SOLID principles, modifying or adding new features becomes risky. For instance, having `CarController` extend `ProductController` created unnecessary complexity, as it inherited irrelevant methods that didn’t apply to cars. This made the code harder to understand, slowed down testing, introduced potential bugs, and required extra effort to track down and modify related files, reducing overall productivity and maintainability.
+
+### Module 4 - Refactoring and TDD
+1. The TDD workflow has definitely helped me envision and write cleaner code. I begin by creating test cases to handle a variety of scenarios, followed by implementing the basic skeleton and functionality needed to make those test cases pass. Once the tests are passing, I then refactor the code, often incorporating enums to improve structure and readability. This process happens iteratively, and it has been especially valuable during this week's project.
+2. 
+- Fast: My test code is fast because I don't rely on external dependencies and use mocks.
+- Independent: I use mock tests to isolate functionality and improve test speed.
+- Repeatable: Yes, my tests are repeatable.
+- Self-validating: Because I took the time to write manual tests at first, I don't have to worry when adding new features about things breaking, as I have test cases ready to run.
+- Timely: Yes, I wrote all of my tests before actually implementing the code.
