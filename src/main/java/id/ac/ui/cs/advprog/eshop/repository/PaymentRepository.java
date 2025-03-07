@@ -1,6 +1,8 @@
 package id.ac.ui.cs.advprog.eshop.repository;
 
 import id.ac.ui.cs.advprog.eshop.model.Payment;
+import enums.PaymentStatus;
+import enums.PaymentMethod;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -11,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Repository
 public class PaymentRepository {
-    private Map<String, Payment> paymentMap;
+    private final Map<String, Payment> paymentMap;
 
     public PaymentRepository() {
         this.paymentMap = new HashMap<>();
@@ -24,7 +26,7 @@ public class PaymentRepository {
 
     public Payment findById(String id) {
         if (!paymentMap.containsKey(id)) {
-            throw new RuntimeException("Payment not found");
+            throw new PaymentNotFoundException("Payment not found");
         }
         return paymentMap.get(id);
     }
@@ -39,7 +41,25 @@ public class PaymentRepository {
                 .collect(Collectors.toList());
     }
 
+    public List<Payment> findByStatus(PaymentStatus status) {
+        return paymentMap.values().stream()
+                .filter(payment -> payment.getStatus().equals(status.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Payment> findByMethod(PaymentMethod method) {
+        return paymentMap.values().stream()
+                .filter(payment -> payment.getMethod().equals(method.getValue()))
+                .collect(Collectors.toList());
+    }
+
     public void delete(String id) {
         paymentMap.remove(id);
+    }
+
+    public static class PaymentNotFoundException extends RuntimeException {
+        public PaymentNotFoundException(String message) {
+            super(message);
+        }
     }
 }
