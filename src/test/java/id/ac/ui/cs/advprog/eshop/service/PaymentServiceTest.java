@@ -34,22 +34,31 @@ class PaymentServiceTest {
 
     @BeforeEach
     void setUp() {
-        paymentService = new PaymentService(paymentRepository);
+        PaymentServiceImpl serviceImpl = new PaymentServiceImpl();
+        setField(serviceImpl, "paymentRepository", paymentRepository);
+        paymentService = serviceImpl;
+    }
+
+    private void setField(Object target, String fieldName, Object value) {
+        try {
+            java.lang.reflect.Field field = PaymentServiceImpl.class.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(target, value);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
     void testCreatePayment() {
-        // Setup
         Map<String, String> paymentData = new HashMap<>();
         paymentData.put("bankName", "Test Bank");
         Payment payment = new Payment("payment-123", "BANK_TRANSFER", paymentData, mockOrder);
 
         when(paymentRepository.save(any(Payment.class))).thenReturn(payment);
 
-        // Execute
         Payment result = paymentService.createPayment(payment);
 
-        // Verify
         assertNotNull(result);
         assertEquals("payment-123", result.getId());
         verify(paymentRepository).save(payment);
@@ -57,82 +66,66 @@ class PaymentServiceTest {
 
     @Test
     void testFindPaymentById() {
-        // Setup
         Map<String, String> paymentData = new HashMap<>();
         Payment expectedPayment = new Payment("payment-123", "BANK_TRANSFER", paymentData, mockOrder);
 
         when(paymentRepository.findById("payment-123")).thenReturn(expectedPayment);
 
-        // Execute
         Payment result = paymentService.findPaymentById("payment-123");
 
-        // Verify
         assertNotNull(result);
         assertEquals(expectedPayment, result);
     }
 
     @Test
     void testFindAllPayments() {
-        // Setup
         List<Payment> expectedPayments = new ArrayList<>();
         expectedPayments.add(new Payment("payment-1", "BANK_TRANSFER", new HashMap<>(), mockOrder));
         expectedPayments.add(new Payment("payment-2", "VOUCHER", new HashMap<>(), mockOrder));
 
         when(paymentRepository.findAll()).thenReturn(expectedPayments);
 
-        // Execute
         List<Payment> results = paymentService.findAllPayments();
 
-        // Verify
         assertEquals(2, results.size());
         assertEquals(expectedPayments, results);
     }
 
     @Test
     void testFindPaymentsByOrderId() {
-        // Setup
         List<Payment> expectedPayments = new ArrayList<>();
         expectedPayments.add(new Payment("payment-1", "BANK_TRANSFER", new HashMap<>(), mockOrder));
 
         when(paymentRepository.findByOrderId("order-123")).thenReturn(expectedPayments);
-        when(mockOrder.getId()).thenReturn("order-123");
 
-        // Execute
         List<Payment> results = paymentService.findPaymentsByOrderId("order-123");
 
-        // Verify
         assertEquals(1, results.size());
         assertEquals(expectedPayments, results);
     }
 
     @Test
     void testUpdatePayment() {
-        // Setup
         Map<String, String> paymentData = new HashMap<>();
         Payment payment = new Payment("payment-123", "BANK_TRANSFER", paymentData, mockOrder);
 
         when(paymentRepository.save(any(Payment.class))).thenReturn(payment);
 
-        // Execute
         Payment result = paymentService.updatePayment(payment);
 
-        // Verify
         assertEquals(payment, result);
         verify(paymentRepository).save(payment);
     }
 
     @Test
     void testDeletePayment() {
-        // Execute
         paymentService.deletePayment("payment-123");
 
-        // Verify
         verify(paymentRepository).delete("payment-123");
     }
 
     @Test
     void testVoucherPayment_ValidVoucher() {
-        // Setup
         Map<String, String> paymentData = new HashMap<>();
         paymentData.put("voucherCode", "ESHOP1234ABC5678");
 
@@ -141,106 +134,88 @@ class PaymentServiceTest {
 
         when(paymentRepository.save(any(Payment.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        // Execute
         Payment result = paymentService.createPayment(payment);
 
-        // Verify
         assertEquals(PaymentStatus.SUCCESS.getValue(), result.getStatus());
     }
 
     @Test
     void testVoucherPayment_InvalidLength() {
-        // Setup
         Map<String, String> paymentData = new HashMap<>();
-        paymentData.put("voucherCode", "ESHOP12345"); // Too short
+        paymentData.put("voucherCode", "ESHOP12345");
 
         Payment payment = new Payment("payment-123", PaymentMethod.VOUCHER.getValue(),
                 PaymentStatus.PENDING.getValue(), paymentData, mockOrder);
 
         when(paymentRepository.save(any(Payment.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        // Execute
         Payment result = paymentService.createPayment(payment);
 
-        // Verify
         assertEquals(PaymentStatus.REJECTED.getValue(), result.getStatus());
     }
 
     @Test
     void testVoucherPayment_InvalidPrefix() {
-        // Setup
         Map<String, String> paymentData = new HashMap<>();
-        paymentData.put("voucherCode", "STORE1234ABC5678"); // Wrong prefix
+        paymentData.put("voucherCode", "STORE1234ABC5678");
 
         Payment payment = new Payment("payment-123", PaymentMethod.VOUCHER.getValue(),
                 PaymentStatus.PENDING.getValue(), paymentData, mockOrder);
 
         when(paymentRepository.save(any(Payment.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        // Execute
         Payment result = paymentService.createPayment(payment);
 
-        // Verify
         assertEquals(PaymentStatus.REJECTED.getValue(), result.getStatus());
     }
 
     @Test
     void testVoucherPayment_NotEnoughNumbers() {
-        // Setup
         Map<String, String> paymentData = new HashMap<>();
-        paymentData.put("voucherCode", "ESHOPABCDEFGHIJK"); // No numerical characters
+        paymentData.put("voucherCode", "ESHOPABCDEFGHIJK");
 
         Payment payment = new Payment("payment-123", PaymentMethod.VOUCHER.getValue(),
                 PaymentStatus.PENDING.getValue(), paymentData, mockOrder);
 
         when(paymentRepository.save(any(Payment.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        // Execute
         Payment result = paymentService.createPayment(payment);
 
-        // Verify
         assertEquals(PaymentStatus.REJECTED.getValue(), result.getStatus());
     }
 
     @Test
     void testVoucherPayment_ExactlyEightNumbers() {
-        // Setup
         Map<String, String> paymentData = new HashMap<>();
-        paymentData.put("voucherCode", "ESHOP12345678ABC"); // Exactly 8 numbers
+        paymentData.put("voucherCode", "ESHOP12345678ABC");
 
         Payment payment = new Payment("payment-123", PaymentMethod.VOUCHER.getValue(),
                 PaymentStatus.PENDING.getValue(), paymentData, mockOrder);
 
         when(paymentRepository.save(any(Payment.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        // Execute
         Payment result = paymentService.createPayment(payment);
 
-        // Verify
         assertEquals(PaymentStatus.SUCCESS.getValue(), result.getStatus());
     }
 
     @Test
     void testVoucherPayment_TooManyNumbers() {
-        // Setup
         Map<String, String> paymentData = new HashMap<>();
-        paymentData.put("voucherCode", "ESHOP1234567890AB"); // 10 numbers, should have 8
+        paymentData.put("voucherCode", "ESHOP1234567890AB");
 
         Payment payment = new Payment("payment-123", PaymentMethod.VOUCHER.getValue(),
                 PaymentStatus.PENDING.getValue(), paymentData, mockOrder);
 
         when(paymentRepository.save(any(Payment.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        // Execute
         Payment result = paymentService.createPayment(payment);
 
-        // Verify
         assertEquals(PaymentStatus.REJECTED.getValue(), result.getStatus());
     }
 
     @Test
     void testNonVoucherPayment() {
-        // Setup
         Map<String, String> paymentData = new HashMap<>();
         paymentData.put("bankName", "Test Bank");
 
@@ -249,10 +224,8 @@ class PaymentServiceTest {
 
         when(paymentRepository.save(any(Payment.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        // Execute
         Payment result = paymentService.createPayment(payment);
 
-        // Verify - status should remain PENDING for non-voucher payments
         assertEquals(PaymentStatus.PENDING.getValue(), result.getStatus());
     }
 }
