@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -17,10 +18,11 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Payment createPayment(Payment payment) {
-        // If it's a voucher payment, validate the voucher code
+        // Only validate voucher payments
         if (payment.getMethod().equals(PaymentMethod.VOUCHER.getValue())) {
             validateVoucherPayment(payment);
         }
+        // For non-voucher payments (like BANK_TRANSFER), preserve the original status
 
         return paymentRepository.save(payment);
     }
@@ -51,9 +53,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     /**
-     * Validates a voucher payment and sets the appropriate status.
-     *
-     * @param payment the voucher payment to validate
+     * Validates a voucher payment and sets the appropriate status
      */
     private void validateVoucherPayment(Payment payment) {
         String voucherCode = payment.getPaymentData().get("voucherCode");
@@ -67,12 +67,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     /**
      * Validates if a voucher code meets the required criteria:
-     * - 16 characters long
-     * - Starts with "ESHOP"
-     * - Contains 8 numerical characters
-     *
-     * @param voucherCode the voucher code to validate
-     * @return true if the voucher code is valid, false otherwise
+     * - Must be 16 characters long
+     * - Must start with "ESHOP"
+     * - Must contain exactly 8 numerical characters
      */
     private boolean isValidVoucherCode(String voucherCode) {
         if (voucherCode == null) {
