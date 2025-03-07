@@ -2,8 +2,8 @@ package id.ac.ui.cs.advprog.eshop.model;
 
 import lombok.Builder;
 import lombok.Getter;
+import enums.PaymentStatus;
 
-import java.util.Arrays;
 import java.util.Map;
 
 @Builder
@@ -14,8 +14,6 @@ public class Payment {
     private String status;
     private Map<String, String> paymentData;
     private Order order;
-
-    private static final String[] VALID_STATUSES = {"PENDING", "SUCCESS", "REJECTED"};
 
     public Payment(String id, String method, String status, Map<String, String> paymentData, Order order) {
         this.id = id;
@@ -35,7 +33,7 @@ public class Payment {
     }
 
     public Payment(String id, String method, Map<String, String> paymentData, Order order) {
-        this(id, method, "PENDING", paymentData, order);
+        this(id, method, PaymentStatus.PENDING.getValue(), paymentData, order);
     }
 
     public void setId(String id) {
@@ -50,7 +48,7 @@ public class Payment {
     }
 
     public void setStatus(String status) {
-        if (Arrays.asList(VALID_STATUSES).contains(status)) {
+        if (PaymentStatus.contains(status)) {
             this.status = status;
         } else {
             throw new IllegalArgumentException();
@@ -66,9 +64,5 @@ public class Payment {
             throw new IllegalArgumentException();
         }
         this.order = order;
-    }
-
-    public static boolean isValidStatus(String status) {
-        return Arrays.asList(VALID_STATUSES).contains(status);
     }
 }
