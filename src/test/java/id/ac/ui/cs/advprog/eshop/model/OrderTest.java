@@ -1,18 +1,14 @@
 package id.ac.ui.cs.advprog.eshop.model;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class OrderTest {
-    private List<Product> products;
+import java.util.ArrayList;
+import java.util.List;
+import static org.junit.jupiter.api.Assertions.*;
 
+class OrderTest {
+    private List<Product> products;
     @BeforeEach
     void setUp() {
         this.products = new ArrayList<>();
@@ -21,8 +17,8 @@ public class OrderTest {
         product1.setProductName("Sampo Cap Bambang");
         product1.setProductQuantity(2);
         Product product2 = new Product();
-        product2.setProductId("a2b3e9f-1c39-460e-8860-71af6af63bd6");
-        product2.setProductName("Sampo Cap Usep");
+        product2.setProductId("a2c62328-4a37-4664-83c7-f32db8620155");
+        product2.setProductName("Sabun Cap Usep");
         product2.setProductQuantity(1);
         this.products.add(product1);
         this.products.add(product2);
@@ -36,17 +32,17 @@ public class OrderTest {
             Order order = new Order("13652556-012a-4c07-b546-54eb1396d79b",
                     this.products, 1708560000L, "Safira Sudrajat");
         });
-
     }
 
     @Test
     void testCreateOrderDefaultStatus() {
         Order order = new Order("13652556-012a-4c07-b546-54eb1396d79b",
                 this.products, 1708560000L, "Safira Sudrajat");
+
         assertSame(this.products, order.getProducts());
         assertEquals(2, order.getProducts().size());
         assertEquals("Sampo Cap Bambang", order.getProducts().get(0).getProductName());
-        assertEquals("Sampo Cap Usep", order.getProducts().get(1).getProductName());
+        assertEquals("Sabun Cap Usep", order.getProducts().get(1).getProductName());
 
         assertEquals("13652556-012a-4c07-b546-54eb1396d79b", order.getId());
         assertEquals(1708560000L, order.getOrderTime());
@@ -58,7 +54,7 @@ public class OrderTest {
     void testCreateOrderSuccessStatus() {
         Order order = new Order("13652556-012a-4c07-b546-54eb1396d79b",
                 this.products, 1708560000L, "Safira Sudrajat", "SUCCESS");
-        assertEquals(this.products, order.getProducts());
+        assertEquals("SUCCESS", order.getStatus());
     }
 
     @Test
@@ -70,11 +66,11 @@ public class OrderTest {
     }
 
     @Test
-    void testSetStatusToCanceled() {
+    void testSetStatusToCancelled() {
         Order order = new Order("13652556-012a-4c07-b546-54eb1396d79b",
-                this.products, 1708560000L, "Safira Sudrajat", "SUCCESS");
-        order.setStatus("CANCELED");
-        assertEquals("CANCELED", order.getStatus());
+                this.products, 1708560000L, "Safira Sudrajat");
+        order.setStatus("CANCELLED");
+        assertEquals("CANCELLED", order.getStatus());
     }
 
     @Test
